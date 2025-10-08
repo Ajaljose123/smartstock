@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Requests - SmartStock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 p-6">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-bold mb-4 text-gray-800">📦 My Requests</h2>
+  <a href="{% url 'supplier_request_product' %}" 
+     class="mb-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">+ New Request</a>
+  <table class="w-full border border-gray-300 rounded-lg overflow-hidden">
+    <thead>
+      <tr class="bg-gray-100 text-gray-700">
+        <th class="p-3 border">Product</th>
+        <th class="p-3 border">Quantity</th>
+        <th class="p-3 border">Price/Unit</th>
+        <th class="p-3 border">Status</th>
+        <th class="p-3 border">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in requests %}
+      <tr class="hover:bg-gray-50">
+        <td class="p-3 border">{{ r.product_name }}</td>
+        <td class="p-3 border">{{ r.quantity }}</td>
+        <td class="p-3 border">${{ r.price_per_unit }}</td>
+        <td class="p-3 border">
+          {% if r.status == "pending" %}
+            <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded">⏳ Pending</span>
+          {% elif r.status == "approved" %}
+            <span class="px-2 py-1 bg-green-100 text-green-800 rounded">✅ Approved</span>
+          {% else %}
+            <span class="px-2 py-1 bg-red-100 text-red-800 rounded">❌ Rejected</span>
+          {% endif %}
+        </td>
+        <td class="p-3 border">{{ r.created_at|date:"d M Y H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5" class="text-center p-4 text-gray-500">No requests submitted yet</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="flex justify-between mt-6">
+                <a href="{% url 'supplier_dashboard' %}" 
+                   class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-gray-800">
+                    ⬅ Back
+                </a>
+              </div>
+</div>
+</body>
+</html>

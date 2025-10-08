@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stock History - {{ product.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .card {
+            background: #1e1e1e;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0px 6px 18px rgba(0, 0, 0, 0.4);
+            padding: 25px;
+        }
+        h2 {
+            color: #ffa726; /* orange accent */
+            font-weight: bold;
+        }
+        .product-info p {
+            margin: 5px 0;
+            font-size: 15px;
+            color: #dcd5ccff
+        }
+        .product-info b {
+            color: #ffa726;
+        }
+        .table {
+            color: #fff;
+            margin-top: 15px;
+        }
+        .table thead {
+            background: #2c2c2c;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+        .table tbody tr:hover {
+            background: rgba(241, 172, 68, 0.1);
+        }
+        .stock-in {
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .stock-out {
+            color: #ff5252;
+            font-weight: bold;
+        }
+        .btn-back {
+            background: #ffa726;
+            border: none;
+            color: #121212;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-back:hover {
+            background: #ff9800;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="card">
+        <h2 class="mb-3">📦 Stock History: <span>{{ product.name }}</span></h2>
+
+        <!-- Product Summary -->
+        <div class="product-info">
+            <p><b>Category:</b> {{ product.category }}</p>
+            <p><b>Current Stock:</b> {{ product.stock }}</p>
+            <p><b>Minimum Stock:</b> {{ product.min_stock }}</p>
+            <p><b>Price:</b> ₹{{ product.price }}</p>
+        </div>
+
+        <!-- History Table -->
+        <h5 class="mt-4">Transaction History</h5>
+        <table class="table table-dark table-hover">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>User</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for txn in transactions %}
+                <tr>
+                    <td>{{ txn.date|date:"d M Y H:i" }}</td>
+                    <td class="{% if txn.type == 'in' %}stock-in{% else %}stock-out{% endif %}">
+                        {{ txn.get_type_display }}
+                    </td>
+                    <td>{{ txn.quantity }}</td>
+                    <td>{{ txn.user.username }}</td>
+                    <td>{{ txn.remarks|default:"-" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No transactions found</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Back button -->
+        <a href="{% url 'admin_dashboard' %}" class="btn btn-back mt-3">⬅ Back to Dashboard</a>
+    </div>
+</div>
+</body>
+</html>

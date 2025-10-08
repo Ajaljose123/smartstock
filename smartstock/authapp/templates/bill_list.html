@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bills - SmartStock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .container {
+            max-width: 80rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6 sm:p-10">
+
+    <div class="container mx-auto rounded-xl shadow-lg bg-white dark:bg-gray-800 p-6 sm:p-10">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-600 dark:text-blue-400">
+                Transaction History
+            </h1>
+            <a href="{% url 'new_bill' %}" class="mt-4 sm:mt-0 px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                + Create New Bill
+            </a>
+        </div>
+
+        {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                    <div class="p-4 rounded-lg {% if message.tags %}
+                        {% if 'success' in message.tags %}bg-green-100 text-green-700{% endif %}
+                        {% if 'error' in message.tags %}bg-red-100 text-red-700{% endif %}
+                    {% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if bills %}
+            <div class="overflow-x-auto rounded-lg border dark:border-gray-700">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
+                                Invoice #
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
+                                Customer Name
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
+                                Total
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-200 uppercase tracking-wider">
+                                Created By
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        {% for bill in bills %}
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ bill.id }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    {{ bill.customer_name }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    ${{ bill.total_amount|floatformat:2 }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    {{ bill.date|date:"d M Y H:i" }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
+                                    {{ bill.created_by.username }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center py-10 text-gray-500 dark:text-gray-400">
+                <p class="text-lg font-semibold">No bills have been created yet.</p>
+                <p class="mt-2">Start by creating a new bill using the button above.</p>
+            </div>
+        {% endif %}
+    </div>
+    <div class="flex justify-end gap-4 mt-12">
+    <a href="{% url 'staff_dashboard' %}" 
+        class="px-6 py-3 font-semibold text-white 
+          bg-gradient-to-r from-blue-500 to-purple-600 
+          rounded-xl shadow-lg hover:shadow-2xl 
+          transform hover:scale-105 transition duration-300 ease-in-out">
+        Back To Dashboard
+    </a>    
+</div>
+
+</body>
+</html>

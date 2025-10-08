@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Orders - SmartStock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-900 p-8">
+  <h1 class="text-2xl font-bold mb-6">📋 My Orders</h1>
+  <table class="min-w-full bg-white shadow rounded-lg">
+    <thead class="bg-gray-200">
+      <tr>
+        <th class="py-2 px-4">Order ID</th>
+        <th class="py-2 px-4">Product</th>
+        <th class="py-2 px-4">Quantity</th>
+        <th class="py-2 px-4">Status</th>
+        <th class="py-2 px-4">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+      <tr class="border-t">
+        <td class="py-2 px-4">#{{ order.id }}</td>
+        <td class="py-2 px-4">{{ order.product.name }}</td>
+        <td class="py-2 px-4">{{ order.quantity }}</td>
+        <td class="py-2 px-4">
+          {% if order.status == "pending" %}
+            <span class="text-yellow-500 font-semibold">Pending</span>
+          {% elif order.status == "dispatched" %}
+            <span class="text-blue-500 font-semibold">Dispatched</span>
+          {% else %}
+            <span class="text-green-600 font-semibold">Delivered</span>
+          {% endif %}
+        </td>
+        <td class="py-2 px-4">{{ order.created_at|date:"d M Y H:i" }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="text-center py-4">No orders yet</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

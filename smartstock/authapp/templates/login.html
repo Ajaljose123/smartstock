@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SmartStock</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'sans': ['Inter', 'Open Sans', 'sans-serif'],
+                        'heading': ['Montserrat', 'sans-serif'],
+                    },
+                    colors: {
+                        'primary-blue': '#4facfe', // Start gradient color
+                        'secondary-blue': '#00f2fe', // End gradient color
+                    },
+                    boxShadow: {
+                        'xl-modern': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif; 
+            background: linear-gradient(to right, #4facfe, #00f2fe);
+            min-height: 100vh;
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center p-4">
+    <div class="login-container bg-white p-8 sm:p-10 rounded-xl shadow-xl-modern w-full max-w-md animate-fadeIn">
+        <h1 class="text-center mb-6 text-3xl font-heading font-extrabold text-gray-800">
+            SmartStock <span class="text-primary-blue">Login</span>
+        </h1>
+        
+        {% comment %} {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == "error" %}
+                <p class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative text-sm text-center font-medium">
+                 {{ message }}
+                 </p>
+                {% endif %}            
+            {% endfor %}
+        {% endif %} {% endcomment %}
+
+        <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700 sr-only">Username</label>
+                <input type="text" id="username" name="username" placeholder="Username" required 
+                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-primary-blue transition duration-300 placeholder-gray-500 text-base">
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700 sr-only">Password</label>
+                <input type="password" id="password" name="password" placeholder="Password" required 
+                       class="mt-1 block w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-blue focus:border-primary-blue transition duration-300 placeholder-gray-500 text-base">
+            </div>
+
+            <button type="submit" 
+                    class="w-full py-3 mt-4 bg-primary-blue text-white font-semibold rounded-lg shadow-lg hover:bg-secondary-blue focus:outline-none focus:ring-4 focus:ring-primary-blue focus:ring-opacity-50 transition duration-300 ease-in-out transform hover:scale-[1.01]">
+                Secure Login
+            </button>
+        </form>
+
+        <div class="register-link text-center mt-6 text-sm">
+            <span class="text-gray-600">Don't have an account?</span> 
+            <a href="{% url 'register' %}" class="font-medium text-primary-blue hover:text-secondary-blue hover:underline transition duration-300">
+                Register here
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Register - SmartStock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    /* Optional: tailwind config (keeps styling consistent) */
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { 'sans': ['Inter','Open Sans','sans-serif'], 'heading': ['Montserrat','sans-serif'] },
+          colors: { 'primary-blue': '#4facfe', 'secondary-blue': '#00f2fe', 'accent-indigo': '#4f46e5' },
+          boxShadow: { 'xl-modern': '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', 'button-active': '0 4px 10px rgba(79,70,229,0.4)' }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg,#4facfe,#00f2fe); min-height:100vh; }
+    .animate-fadeIn { animation: fadeIn 0.6s ease-in-out; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(-10px) } to { opacity:1; transform:translateY(0) } }
+
+    /* shake animation for disabled click feedback */
+    @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-6px)} 40%,80%{transform:translateX(6px)} }
+    .shake { animation: shake 0.4s; }
+
+    /* simple helpers for disabled appearance (if Tailwind custom colors not applied) */
+    .disabled-look { background-color:#9ca3af; cursor:not-allowed; }
+  </style>
+</head>
+<body class="flex items-center justify-center p-4">
+  <div class="register-container bg-white p-8 sm:p-10 rounded-xl shadow-xl-modern w-full max-w-lg animate-fadeIn">
+    <h1 class="text-center mb-6 text-3xl font-heading font-extrabold text-gray-800">SmartStock <span class="text-primary-blue">Register</span></h1>
+
+{% if messages %}
+  {% for message in messages %}
+    {% if message.tags == "success" %}
+      <p class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg text-sm text-center font-medium mb-3">
+        {{ message }}
+      </p>
+    {% elif message.tags == "error" %}
+      <p class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg text-sm text-center font-medium mb-3">
+        {{ message }}
+      </p>
+    {% endif %}
+  {% endfor %}
+{% endif %}
+
+
+    <form id="registerForm" method="POST" action="{% url 'register' %}" class="space-y-4">
+      {% csrf_token %}
+
+      <!-- Role Toggle -->
+      <div class="flex justify-center gap-4 mb-6">
+        <input type="hidden" name="role" id="roleField" value="staff">
+        <button type="button" id="staffBtn" class="px-5 py-2.5 w-1/2 rounded-xl font-bold shadow-button-active transition duration-300 transform hover:scale-[1.02] bg-accent-indigo text-white hover:bg-indigo-600">Staff</button>
+        <button type="button" id="supplierBtn" class="px-5 py-2.5 w-1/2 rounded-xl font-semibold shadow-md transition duration-300 transform hover:scale-[1.02] bg-gray-100 text-gray-700 hover:bg-gray-200">Supplier</button>
+      </div>
+
+      <!-- Staff Fields -->
+      <div id="staffFields">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <input type="text" name="first_name" placeholder="First Name" required class="w-full px-4 py-3 border rounded-lg">
+          <input type="text" name="last_name" placeholder="Last Name" required class="w-full px-4 py-3 border rounded-lg">
+        </div>
+
+        <input type="text" name="username_staff" placeholder="Username" required class="w-full px-4 py-3 border rounded-lg">
+        <input type="password" name="password_staff" placeholder="Password" required class="w-full px-4 py-3 border rounded-lg">
+        <input type="password" name="confirm_password_staff" placeholder="Confirm Password" required class="w-full px-4 py-3 border rounded-lg">
+        <input type="tel" name="phone_staff" placeholder="Phone Number" pattern="[0-9]{10}" title="Enter 10-digit phone number" required class="w-full px-4 py-3 border rounded-lg">
+
+        <div>
+          <span class="block font-medium text-gray-700 mb-1">Gender</span>
+          <div class="flex gap-6">
+            <label class="flex items-center gap-2"><input type="radio" name="gender_staff" value="male" required> Male</label>
+            <label class="flex items-center gap-2"><input type="radio" name="gender_staff" value="female" required> Female</label>
+            <label class="flex items-center gap-2"><input type="radio" name="gender_staff" value="other" required> Other</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supplier Fields (hidden initially) -->
+      <div id="supplierFields" class="hidden">
+        <input type="text" name="supplier_name" placeholder="Company / Supplier Name" required class="w-full px-4 py-3 border rounded">
+        <input type="text" name="contact_person" placeholder="Contact Person" class="w-full px-4 py-3 border rounded">
+        <input type="text" name="username_supplier" placeholder="Username" required class="w-full px-4 py-3 border rounded">
+        <input type="password" name="password_supplier" placeholder="Password" required class="w-full px-4 py-3 border rounded">
+        <input type="password" name="confirm_password_supplier" placeholder="Confirm Password" required class="w-full px-4 py-3 border rounded">
+        <input type="tel" name="phone_supplier" placeholder="Phone Number" class="w-full px-4 py-3 border rounded">
+        <input type="email" name="email_supplier" placeholder="Email" class="w-full px-4 py-3 border rounded">
+        <textarea name="address_supplier" placeholder="Address" class="w-full px-4 py-3 border rounded"></textarea>
+      </div>
+
+      <!-- Terms -->
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="agreeCheckbox" class="w-4 h-4">
+        <label for="agreeCheckbox" class="text-sm text-gray-600">
+          I agree to the <a href="#" id="termsLink" class="text-primary-blue underline">Terms & Conditions</a>
+        </label>
+      </div>
+
+      <!-- Register Button -->
+      <button type="submit" id="registerBtn" disabled class="w-full py-3 bg-gray-400 text-white font-semibold rounded-lg shadow-lg cursor-not-allowed transition duration-300">Register</button>
+    </form>
+
+    <p class="text-center text-sm text-gray-600 mt-6">Already have an account? <a href="{% url 'login' %}" class="font-medium text-primary-blue underline">Login here</a></p>
+  </div>
+
+  <!-- Terms popup -->
+  <div class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" id="termsPopup">
+    <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 text-center">
+      <h3 class="text-lg font-semibold mb-2">Terms & Conditions</h3>
+      <p class="text-gray-600 text-sm">By registering, you agree to follow all company policies and maintain confidentiality of information.</p>
+      <button type="button" id="closePopup" class="mt-4 px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600">Close</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const staffBtn = document.getElementById('staffBtn');
+      const supplierBtn = document.getElementById('supplierBtn');
+      const staffFields = document.getElementById('staffFields');
+      const supplierFields = document.getElementById('supplierFields');
+      const roleField = document.getElementById('roleField');
+      const agreeCheckbox = document.getElementById('agreeCheckbox');
+      const registerBtn = document.getElementById('registerBtn');
+      const termsLink = document.getElementById('termsLink');
+      const termsPopup = document.getElementById('termsPopup');
+      const closePopup = document.getElementById('closePopup');
+      const activeClasses = ["bg-accent-indigo","text-white","font-bold","shadow-button-active","hover:bg-indigo-600"];
+      const inactiveClasses = ["bg-gray-100","text-gray-700","font-semibold","shadow-md","hover:bg-gray-200"];
+
+      // helper to enable/disable all form controls inside a container
+      function setControlsDisabled(container, disabled) {
+        const controls = container.querySelectorAll('input, textarea, select, button');
+        controls.forEach(c => {
+          // do not disable the role toggle buttons or other functional buttons outside the form
+        if (c.name === 'csrfmiddlewaretoken' || c.id === 'staffBtn' || c.id === 'supplierBtn') return;         
+           c.disabled = disabled;
+        });
+      }
+
+      // helper to toggle active/inactive button styles
+      function setActiveButton(activeBtn, inactiveBtn) {
+        activeBtn.classList.remove(...inactiveClasses);
+        activeBtn.classList.add(...activeClasses);
+        inactiveBtn.classList.remove(...activeClasses);
+        inactiveBtn.classList.add(...inactiveClasses);
+      }
+
+      // set role and toggle fields + disabled state
+      function setRole(role) {
+        roleField.value = role;
+        if (role === 'staff') {
+          staffFields.classList.remove('hidden');
+          supplierFields.classList.add('hidden');
+          setControlsDisabled(staffFields, false);
+          setControlsDisabled(supplierFields, true);
+          setActiveButton(staffBtn, supplierBtn);
+        } else {
+          supplierFields.classList.remove('hidden');
+          staffFields.classList.add('hidden');
+          setControlsDisabled(supplierFields, false);
+          setControlsDisabled(staffFields, true);
+          setActiveButton(supplierBtn, staffBtn);
+        }
+      }
+
+      // initial state: staff active, supplier controls disabled
+      setRole('staff');
+
+      staffBtn.addEventListener('click', () => setRole('staff'));
+      supplierBtn.addEventListener('click', () => setRole('supplier'));
+
+      // terms checkbox logic
+      agreeCheckbox.addEventListener('change', () => {
+        registerBtn.disabled = !agreeCheckbox.checked;
+        if (agreeCheckbox.checked) {
+          registerBtn.classList.remove('bg-gray-400','cursor-not-allowed','disabled-look');
+          registerBtn.classList.add('bg-primary-blue','hover:bg-secondary-blue','cursor-pointer');
+        } else {
+          registerBtn.classList.remove('bg-primary-blue','hover:bg-secondary-blue','cursor-pointer');
+          registerBtn.classList.add('bg-gray-400','cursor-not-allowed','disabled-look');
+        }
+      });
+
+      // show terms popup
+      termsLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        termsPopup.classList.remove('hidden');
+      });
+      closePopup.addEventListener('click', () => termsPopup.classList.add('hidden'));
+
+      // defensive submit handler: if disabled or required fields missing, prevent and shake
+      document.getElementById('registerForm').addEventListener('submit', (e) => {
+        // if button disabled (means checkbox unchecked) prevent and shake
+        if (registerBtn.disabled) {
+          e.preventDefault();
+          registerBtn.classList.add('shake');
+          setTimeout(() => registerBtn.classList.remove('shake'), 400);
+          return;
+        }
+        // Let HTML5 validation run — since we disable the inactive role controls, only visible inputs are validated.
+        // If you want additional client-side checks (password match etc.), add them here.
+      });
+
+      // Optional: basic client-side password match check for both roles (visual feedback)
+      function wirePasswordMatch(staff=true) {
+        const pw = document.querySelector(staff ? '[name="password_staff"]' : '[name="password_supplier"]');
+        const cpw = document.querySelector(staff ? '[name="confirm_password_staff"]' : '[name="confirm_password_supplier"]');
+        if (!pw || !cpw) return;
+        function check() {
+          if (pw.value && cpw.value && pw.value !== cpw.value) {
+            cpw.setCustomValidity("Passwords do not match");
+          } else {
+            cpw.setCustomValidity("");
+          }
+        }
+        pw.addEventListener('input', check);
+        cpw.addEventListener('input', check);
+      }
+      wirePasswordMatch(true);
+      wirePasswordMatch(false);
+
+      // Debug helper (uncomment while debugging)
+      // console.log("Initial role:", roleField.value);
+    });
+  </script>
+</body>
+</html>
