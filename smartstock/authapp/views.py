@@ -308,11 +308,17 @@ def reject_supplier_request(request, request_id):
         messages.warning(request, f"⚠️ Request for '{req.product_name}' is already {req.status}.")
         return redirect("admin_supplier_requests")
 
-    req.status = "rejected"
-    req.save()
+    if request.method == "POST":
+        rejection_reason = request.POST.get('rejection_reason', '').strip()
+        req.status = "rejected"
+        req.rejection_reason = rejection_reason
+        req.save()
 
-    messages.error(request, f"❌ Supplier request for '{req.product_name}' has been rejected.")
-    return redirect("admin_supplier_requests")
+        messages.error(request, f"❌ Supplier request for '{req.product_name}' has been rejected.")
+        return redirect("admin_supplier_requests")
+    
+    # If GET request, show rejection form
+    return render(request, "reject_request_form.html", {"request": req})
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -647,11 +653,22 @@ def approve_supplier(request, supplier_id):
 @role_required(["admin"])
 def reject_supplier(request, supplier_id):
     supplier = get_object_or_404(Supplier, id=supplier_id)
-    supplier.status = "rejected"
-    supplier.save()
-    messages.error(request, f"Supplier {supplier.name} rejected ❌")
-    request.session["request_warning_shown"] = False
-    return redirect("supplier_management")
+    
+    if supplier.status != "pending":
+        messages.warning(request, f"⚠️ Supplier '{supplier.name}' is already {supplier.status}.")
+        return redirect("supplier_management")
+
+    if request.method == "POST":
+        rejection_reason = request.POST.get('rejection_reason', '').strip()
+        supplier.status = "rejected"
+        supplier.rejection_reason = rejection_reason
+        supplier.save()
+        messages.error(request, f"Supplier {supplier.name} rejected ❌")
+        request.session["request_warning_shown"] = False
+        return redirect("supplier_management")
+    
+    # If GET request, show rejection form
+    return render(request, "reject_supplier_form.html", {"supplier": supplier})
 
 @login_required
 @role_required(["supplier"])
@@ -661,11 +678,14 @@ def supplier_pending(request):
     if supplier and supplier.status == "approved":
         return redirect("supplier_dashboard")  # already approved
     elif supplier and supplier.status == "rejected":
-        message = "❌ Your supplier account has been rejected. Contact admin for details."
+        context = {
+            "status": supplier.status,
+            "rejection_reason": supplier.rejection_reason
+        }
     else:
-        message = "⏳ Your supplier account is pending approval. Please wait until an admin approves it."
+        context = {"status": supplier.status if supplier else "pending"}
 
-    return render(request, "supplier_pending.html", {"status": supplier.status})
+    return render(request, "supplier_pending.html", context)
 
 @login_required
 @role_required(["supplier"])

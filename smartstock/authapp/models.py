@@ -86,6 +86,7 @@ class Supplier(models.Model):
     email = models.EmailField(blank=True, null=True)
     address = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    rejection_reason = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -117,6 +118,7 @@ class SupplierRequest(models.Model):
         ("approved", "Approved"),
         ("rejected", "Rejected"),
     ], default="pending")
+    rejection_reason = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
