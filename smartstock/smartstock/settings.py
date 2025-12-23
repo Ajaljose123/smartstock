@@ -67,7 +67,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'smartstock.wsgi.application'
+WSGI_APPLICATION = 'smartstock.smartstock.wsgi.application'
 
 
 # Database
